@@ -1,0 +1,52 @@
+//tells prisma to generate js/ts client, creates prisma client module
+generator client{
+  provider = "prisma-client-js"
+}
+
+// using postgresql, connecting via docker URL
+datasource db{
+  provider = "postgresql"
+  url = env("DATABASE_URL")
+}
+
+// definig user table
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+
+  urls         Url[]
+}
+
+//creates URL table
+model Url {
+  id          Int      @id @default(autoincrement())
+  shortCode   String   @unique
+  longUrl     String
+  clickCount  Int      @default(0)
+  expiryDate  DateTime?
+  createdAt   DateTime @default(now())
+
+  userId      Int?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  clicks      Click[]
+
+  @@index([shortCode])
+  @@index([userId])
+  @@index([createdAt])
+}
+
+model Click {
+  id        Int      @id @default(autoincrement())
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  urlId     Int
+  url       Url      @relation(fields: [urlId], references: [id], onDelete: Cascade)
+
+  @@index([urlId])
+  @@index([createdAt])
+}
