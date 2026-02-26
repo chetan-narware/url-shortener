@@ -1,8 +1,10 @@
-import express from "express";
+import express, { Request, Response, NextFunction } from "express";
 import helmet from "helmet";
 import cors from "cors";
 import rateLimit from "express-rate-limit";
 import morgan from "morgan";
+
+import authRoutes from "./modules/auth/auth.routes.js";
 
 const app = express();
 
@@ -16,8 +18,8 @@ app.use(helmet());
 //
 app.use(
   cors({
-    origin: "*", // restrict later in production
-    methods: ["GET", "POST"],
+    origin: "*", // restrict in production
+    methods: ["GET", "POST", "PUT", "DELETE"],
   })
 );
 
@@ -35,8 +37,10 @@ app.use(morgan("dev"));
 // Rate Limiter
 //
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 mins
-  max: 100, // max 100 requests per IP
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // 100 requests per IP
+  standardHeaders: true,
+  legacyHeaders: false,
   message: {
     success: false,
     message: "Too many requests, try again later.",
@@ -48,20 +52,49 @@ app.use(limiter);
 //
 // Health Route
 //
-app.get("/health", (_req, res) => {
+app.get("/health", (_req: Request, res: Response) => {
   res.status(200).json({ status: "ok" });
 });
 
 //
-// Global Error Middleware (VERY IMPORTANT)
+// Auth Routes
 //
-app.use((err: any, _req: any, res: any, _next: any) => {
-  console.error("Global Error:", err);
+app.use("/api/auth", authRoutes);
 
-  res.status(err.status || 500).json({
+//
+// 404 Handler (Optional but recommended)
+//
+app.use((_req: Request, res: Response) => {
+  res.status(404).json({
     success: false,
-    message: err.message || "Internal Server Error",
+    message: "Route not found",
   });
 });
+
+//
+// Global Error Handler (Must be last)
+//
+app.use(
+  (
+    err: unknown,
+    _req: Request,
+    res: Response,
+    _next: NextFunction
+  ) => {
+    console.error("Global Error:", err);
+
+    if (err instanceof Error) {
+      return res.status(500).json({
+        success: false,
+        message: err.message,
+      });
+    }
+
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+);
 
 export default app;
