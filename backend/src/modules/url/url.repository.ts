@@ -39,3 +39,16 @@ export const incrementClickCount = async (id: number) => {
   });
 };
 
+export const createClick = async (
+  urlId: number,
+  ipAddress?: string,
+  userAgent?: string
+) => {
+  return prisma.click.create({
+    data: {
+      urlId,
+      ipAddress: ipAddress ?? null,
+      userAgent: userAgent ?? null,
+    },
+  });
+};

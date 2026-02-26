@@ -1,5 +1,5 @@
 import {nanoid} from "nanoid";
-import { createUrl,findByShortCode,deleteUrl,incrementClickCount } from "./url.repository.js";
+import { createUrl,findByShortCode,deleteUrl,incrementClickCount, createClick } from "./url.repository.js";
 import { error } from "node:console";
 
 export const generateShortCode = () => {
@@ -51,4 +51,28 @@ export const removeUrl = async (
   }
 
   return deleteUrl(shortCode);
+};
+
+export const handleRedirect = async (
+  shortCode: string,
+  ipAddress?: string,
+  userAgent?: string
+) => {
+  const url = await findByShortCode(shortCode);
+
+  if (!url) {
+    throw new Error("URL not found");
+  }
+
+  if (url.expiryDate && new Date() > url.expiryDate) {
+    throw new Error("URL has expired");
+  }
+
+  // Increment counter
+  await incrementClickCount(url.id);
+
+  // Store click analytics
+  await createClick(url.id, ipAddress, userAgent);
+
+  return url.longUrl;
 };

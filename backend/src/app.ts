@@ -5,6 +5,7 @@ import rateLimit from "express-rate-limit";
 import morgan from "morgan";
 
 import authRoutes from "./modules/auth/auth.routes.js";
+import urlRoutes from "./modules/url/url.routes.js";
 
 const app = express();
 
@@ -60,6 +61,11 @@ app.get("/health", (_req: Request, res: Response) => {
 // Auth Routes
 //
 app.use("/api/auth", authRoutes);
+
+//
+// URL Routes
+//
+app.use("/api/urls", urlRoutes);
 
 //
 // 404 Handler (Optional but recommended)
