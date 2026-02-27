@@ -6,15 +6,16 @@ const router = Router();
 const controller = new AnalyticsController();
 
 router.get(
+  "/user",
+  authenticate,
+  controller.getUserAnalytics.bind(controller)
+);
+
+router.get(
   "/:shortCode",
   authenticate,
   controller.getUrlAnalytics.bind(controller)
 );
 
-router.get(
-  "/user",
-  authenticate,
-  controller.getUserAnalytics.bind(controller)
-);
 
 export default router;

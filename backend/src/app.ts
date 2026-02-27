@@ -6,17 +6,14 @@ import morgan from "morgan";
 
 import authRoutes from "./modules/auth/auth.routes.js";
 import urlRoutes from "./modules/url/url.routes.js";
+import analyticsRoutes from "./modules/analytics/analytics.routes.js";
 
 const app = express();
 
-//
 // Security Headers
-//
 app.use(helmet());
 
-//
 // Enable CORS
-//
 app.use(
   cors({
     origin: "*", // restrict in production
@@ -24,19 +21,13 @@ app.use(
   })
 );
 
-//
 // Body Parser
-//
 app.use(express.json());
 
-//
 // HTTP Request Logger
-//
 app.use(morgan("dev"));
 
-//
 // Rate Limiter
-//
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // 100 requests per IP
@@ -50,26 +41,21 @@ const limiter = rateLimit({
 
 app.use(limiter);
 
-//
 // Health Route
-//
 app.get("/health", (_req: Request, res: Response) => {
   res.status(200).json({ status: "ok" });
 });
 
-//
 // Auth Routes
-//
 app.use("/api/auth", authRoutes);
 
-//
 // URL Routes
-//
 app.use("/api/urls", urlRoutes);
 
-//
+// analytics
+app.use("/api/analytics", analyticsRoutes);
+
 // 404 Handler (Optional but recommended)
-//
 app.use((_req: Request, res: Response) => {
   res.status(404).json({
     success: false,
@@ -77,9 +63,8 @@ app.use((_req: Request, res: Response) => {
   });
 });
 
-//
+
 // Global Error Handler (Must be last)
-//
 app.use(
   (
     err: unknown,
