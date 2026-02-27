@@ -46,35 +46,36 @@ Backend API
 
 ---
 
-## 📂 Folder Structure
+## 📂 Folder Breakdown
 
+### 🔹 `api/`
+Handles API communication  
+- `axios.ts` – Configured Axios instance with interceptors
 
-src/
-│
-├── api/
-│ └── axios.ts
-│
-├── components/
-│ ├── Navbar.tsx
-│ └── ProtectedRoute.tsx
-│
-├── context/
-│ └── AuthContext.tsx
-│
-├── hooks/
-│ └── useAuth.ts
-│
-├── pages/
-│ ├── Home.tsx
-│ ├── Login.tsx
-│ ├── Register.tsx
-│ ├── Dashboard.tsx
-│ └── Analytics.tsx
-│
-├── App.tsx
-└── main.tsx
+### 🔹 `components/`
+Reusable UI components  
+- `Navbar.tsx`  
+- `ProtectedRoute.tsx`
 
+### 🔹 `context/`
+Global state management  
+- `AuthContext.tsx`
 
+### 🔹 `hooks/`
+Custom React hooks  
+- `useAuth.ts`
+
+### 🔹 `pages/`
+Application pages  
+- `Home.tsx`  
+- `Login.tsx`  
+- `Register.tsx`  
+- `Dashboard.tsx`  
+- `Analytics.tsx`
+
+### 🔹 Root
+- `App.tsx` – Routing and layout structure  
+- `main.tsx` – React bootstrap file  
 ---
 
 ## 🔐 Authentication Design
