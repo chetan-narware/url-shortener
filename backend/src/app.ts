@@ -42,7 +42,7 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // Health Route
-app.get("/health", (_req: Request, res: Response) => {
+app.get("/api/health", (_req: Request, res: Response) => {
   res.status(200).json({ status: "ok" });
 });
 
