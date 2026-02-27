@@ -256,7 +256,7 @@ npm install
 
 Create .env:
 
-DATABASE_URL=postgresql://chetan:chetan@localhost:5432/url_shortener
+DATABASE_URL=postgresql://user:pass@localhost:5432/url_shortener
 JWT_SECRET=your_secret
 PORT=3000
 REDIS_URL=redis://localhost:6379
@@ -269,8 +269,9 @@ npm run dev
 Server runs at:
 
 http://localhost:3000
+```
 📈 Scalability Considerations
-
+---
 Redis reduces database load
 
 Indexed shortCode lookup
@@ -282,7 +283,7 @@ Modular architecture supports microservice split
 Stateless JWT auth enables horizontal scaling
 
 🔮 Future Improvements
-
+---
 Rate limiting per user
 
 Click geo-location analytics
@@ -297,9 +298,7 @@ Background analytics aggregation
 
 Monitoring (Prometheus / Grafana)
 
-CI/CD pipeline
-
 📌 Author
-
+---
 Chetan Narware
 ---
