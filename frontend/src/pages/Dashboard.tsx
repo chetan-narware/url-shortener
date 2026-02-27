@@ -42,7 +42,7 @@ const Dashboard = () => {
   };
 
   const copyToClipboard = (shortCode: string) => {
-    const fullUrl = `http://localhost:3000/api/urls/${shortCode}`;
+    const fullUrl = `${import.meta.env.VITE_API_URL}/api/urls/${shortCode}`;
     navigator.clipboard.writeText(fullUrl);
     alert("Link copied to clipboard");
   };
@@ -98,7 +98,7 @@ const Dashboard = () => {
                     <div>
                       <p className="text-sm text-gray-400">Short Link</p>
                       <a
-                        href={`http://localhost:3000/api/urls/${url.shortCode}`}
+                       href={`${import.meta.env.VITE_API_URL}/api/urls/${url.shortCode}`}
                         target="_blank"
                         className="text-blue-400 hover:underline break-all"
                       >
