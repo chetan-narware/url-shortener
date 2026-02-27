@@ -1,208 +1,235 @@
-🔗 Shortify
-Scalable URL Shortener with Analytics & Redis Caching
+# 🔗 Shortify  
+### Scalable URL Shortener with Analytics & Redis Caching
 
-Shortify is a full-stack URL shortening system designed with production-oriented backend architecture, Redis caching, and analytics aggregation.
+---
+
+## 📌 Overview
+
+**Shortify** is a full-stack URL shortening system designed with production-oriented backend architecture, Redis caching, and analytics aggregation.
 
 This project focuses heavily on backend design decisions, scalability awareness, and clean architecture principles.
 
-🚀 Tech Stack
-Backend
+---
 
-Node.js 20
+# 🚀 Tech Stack
 
-TypeScript
+---
 
-Express 5
+## 🖥 Backend
 
-PostgreSQL
+- Node.js 20
+- TypeScript
+- Express 5
+- PostgreSQL
+- Prisma ORM
+- Redis
+- Docker & Docker Compose
+- JWT Authentication
+- bcrypt (password hashing)
 
-Prisma ORM
+---
 
-Redis
+## 🎨 Frontend
 
-Docker & Docker Compose
+- React
+- TypeScript
+- Vite
+- Tailwind CSS
+- Recharts
 
-JWT Authentication
+---
 
-bcrypt (password hashing)
+# 🏗 System Architecture
 
-Frontend
 
-React
-
-TypeScript
-
-Vite
-
-Tailwind CSS
-
-Recharts
-
-🏗 System Architecture
 Browser (React)
-        ↓
+↓
 Node.js API (Express + TypeScript)
-        ↓
+↓
 Redis (Cache Layer)
-        ↓
+↓
 PostgreSQL (Source of Truth)
-Backend Layered Architecture
+
+
+---
+
+## Backend Layered Architecture
+
+
 Controller → Service → Repository → Prisma → PostgreSQL
 
-Controllers handle HTTP logic
 
-Services contain business rules
-
-Repositories manage data access
-
-Prisma abstracts database communication
+- **Controllers** handle HTTP logic  
+- **Services** contain business rules  
+- **Repositories** manage data access  
+- **Prisma** abstracts database communication  
 
 This separation keeps the system modular, scalable, and maintainable.
 
-🔐 Authentication
+---
 
-JWT-based authentication
+# 🔐 Authentication
 
-bcrypt password hashing
+- JWT-based authentication  
+- bcrypt password hashing  
+- Protected routes middleware  
+- Stateless design (supports horizontal scaling)
 
-Protected routes middleware
+---
 
-Stateless design (supports horizontal scaling)
+# 🔄 Redirect & Caching Strategy
 
-🔄 Redirect & Caching Strategy
+## Cache Pattern Used  
+**Cache-Aside (Lazy Loading)**
 
-Cache Pattern Used: Cache-Aside (Lazy Loading)
+---
 
-Redirect flow:
+## Redirect Flow
 
-1. Client requests shortCode
+1. Client requests `shortCode`
 2. Check Redis cache
-3. Cache hit → return longUrl
+3. Cache hit → return `longUrl`
 4. Cache miss → fetch from PostgreSQL
 5. Store result in Redis (TTL: 1 hour)
-6. Log click in Click table
-7. Increment clickCount
-8. Send 302 redirect
+6. Log click in `Click` table
+7. Increment `clickCount`
+8. Send `302` redirect
 
-Why Redis?
+---
 
-Reduces database load
+## Why Redis?
 
-Improves redirect latency
+- Reduces database load  
+- Improves redirect latency  
+- Optimized for read-heavy workloads  
 
-Optimized for read-heavy workloads
+---
 
-📊 Analytics Engine
+# 📊 Analytics Engine
 
-Instead of storing only a click counter, a dedicated Click table is used.
+Instead of storing only a click counter, a dedicated `Click` table is used.
 
 This enables:
 
-Daily click aggregation
+- Daily click aggregation  
+- Peak day detection  
+- Average click computation  
+- Future extensibility (geo/IP analytics)
 
-Peak day detection
+---
 
-Average click computation
+## Analytics Endpoints
 
-Future extensibility (geo/IP analytics)
-
-Endpoints:
 
 GET /api/analytics/:shortCode
 GET /api/analytics/user
 
-Analytics returned:
 
-Total clicks
+---
 
-Clicks grouped by date
+## Analytics Returned
 
-URL metadata
+- Total clicks  
+- Clicks grouped by date  
+- URL metadata  
 
-🗃 Database Design
-User
+---
 
-id (PK)
+# 🗃 Database Design
 
-email (unique)
+---
 
-passwordHash
+## User
 
-createdAt
+- id (PK)
+- email (unique)
+- passwordHash
+- createdAt
 
-Url
+---
 
-id (PK)
+## Url
 
-shortCode (unique, indexed)
+- id (PK)
+- shortCode (unique, indexed)
+- longUrl
+- clickCount
+- expiryDate (optional)
+- userId (FK)
+- createdAt
 
-longUrl
+---
 
-clickCount
+## Click
 
-expiryDate (optional)
+- id (PK)
+- urlId (indexed, cascade delete)
+- ipAddress
+- userAgent
+- createdAt (indexed)
 
-userId (FK)
+---
 
-createdAt
+## Indexing Strategy
 
-Click
-
-id (PK)
-
-urlId (indexed, cascade delete)
-
-ipAddress
-
-userAgent
-
-createdAt (indexed)
-
-Indexing Strategy
-
-shortCode indexed for fast redirect lookup
-
-userId indexed for dashboard queries
-
-createdAt indexed for time-based analytics
-
-urlId indexed for efficient aggregation
+- `shortCode` indexed for fast redirect lookup  
+- `userId` indexed for dashboard queries  
+- `createdAt` indexed for time-based analytics  
+- `urlId` indexed for efficient aggregation  
 
 Designed for:
 
-Low-latency redirects
+- Low-latency redirects  
+- Efficient time-series queries  
+- Scalable growth  
 
-Efficient time-series queries
+---
 
-Scalable growth
+# 📸 Application Preview
 
-📸 Application Preview
+---
 
-Home
+## 🏠 Home
 
+![Home Screenshot](./assets/Home.png)
 
-Login
+---
 
+## 🔐 Login
 
-Register
+![Login Screenshot](./assets/Login.png)
 
+---
 
-Dashboard
+## 📝 Register
 
+![Register Screenshot](./assets/register.png)
 
-Analytics
+---
 
+## 📊 Dashboard
 
-🐳 Infrastructure
+![Dashboard Screenshot](./assets/Dashboard.png)
+
+---
+
+## 📈 Analytics
+
+![Analytics Screenshot](./assets/Analytics.png)
+---
+
+# 🐳 Infrastructure
 
 Docker Compose services:
 
-PostgreSQL (port 5432)
+- PostgreSQL (port 5432)  
+- Redis (port 6379)  
 
-Redis (port 6379)
+---
 
-Start infrastructure:
+## Start Infrastructure
 
+```bash
 docker-compose up -d
 🚀 Running Locally
 Backend
@@ -212,18 +239,20 @@ npx prisma migrate dev
 npm run dev
 
 Runs at:
-
 http://localhost:3000
+
 Frontend
 cd frontend
 npm install
 npm run dev
 
 Runs at:
-
 http://localhost:5173
-📈 Scalability Considerations
 
+```
+
+📈 Scalability Considerations
+---
 Stateless JWT authentication
 
 Redis for high-frequency read optimization
@@ -237,7 +266,7 @@ Dockerized environment for portability
 Designed for horizontal scalability
 
 🔮 Future Improvements
-
+----
 Custom short aliases
 
 Geo-location analytics
@@ -252,10 +281,8 @@ Monitoring integration (Prometheus / Grafana)
 
 CI/CD pipeline
 
-Nginx reverse proxy for production
-
 🎯 What This Project Demonstrates
-
+---
 Backend system design thinking
 
 Real-world caching implementation
@@ -265,3 +292,11 @@ Database modeling decisions
 Clean architecture separation
 
 Analytics aggregation logic
+
+Production mindset
+
+This is not just a CRUD application , it is a backend-oriented system design project with full-stack integration.
+
+👨‍💻 Author
+---
+Chetan Narware
