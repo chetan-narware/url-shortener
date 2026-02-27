@@ -7,9 +7,13 @@ const Register = () => {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
       await api.post("/auth/register", {
@@ -17,43 +21,59 @@ const Register = () => {
         password,
       });
 
-      alert("Registration successful");
       navigate("/login");
     } catch (error) {
       alert("Registration failed");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div className="flex items-center justify-center h-screen">
+    <div className="min-h-screen bg-gray-900 flex items-center justify-center px-6">
       <form
         onSubmit={handleSubmit}
-        className="bg-white p-6 rounded shadow w-96"
+        className="bg-gray-800 p-8 rounded-lg shadow-lg w-full max-w-md border border-gray-700"
       >
-        <h2 className="text-xl font-bold mb-4">Register</h2>
+        <h2 className="text-2xl font-semibold text-white mb-6 text-center">
+          Create Account
+        </h2>
 
         <input
           type="email"
           placeholder="Email"
-          className="w-full mb-3 p-2 border rounded"
+          className="w-full mb-4 p-3 rounded bg-gray-700 border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+          required
         />
 
         <input
           type="password"
           placeholder="Password"
-          className="w-full mb-3 p-2 border rounded"
+          className="w-full mb-6 p-3 rounded bg-gray-700 border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-600"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          required
         />
 
         <button
           type="submit"
-          className="w-full bg-green-500 text-white p-2 rounded"
+          disabled={loading}
+          className="w-full bg-green-600 hover:bg-green-700 text-white p-3 rounded transition"
         >
-          Register
+          {loading ? "Creating..." : "Register"}
         </button>
+
+        <p className="text-gray-400 text-sm text-center mt-6">
+          Already have an account?{" "}
+          <span
+            onClick={() => navigate("/login")}
+            className="text-blue-400 cursor-pointer hover:underline"
+          >
+            Login
+          </span>
+        </p>
       </form>
     </div>
   );
