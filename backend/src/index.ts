@@ -1,12 +1,8 @@
-import { prisma } from "./config/db";
+import "dotenv/config";
+import app from "./app.js";
 
-async function main() {
-  const users = await prisma.user.findMany();
-  console.log(users);
-}
+const PORT = process.env.PORT || 3000;
 
-main()
-  .catch(console.error)
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});

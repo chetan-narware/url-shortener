@@ -38,11 +38,13 @@ export const loginUser = async (email: string, password: string) => {
     }
 
     const token = jwt.sign(
-        { userID: user.id},
+        {
+            id: user.id,
+            email: user.email
+        },
         JWT_SECRET,
-        { expiresIn: "7d"}
+        { expiresIn: "7d" }
     );
 
     return token;
 }
-

@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { createShortUrl, getLongUrl, removeUrl, handleRedirect} from "./url.service.js";
+import { createShortUrl, removeUrl, handleRedirect } from "./url.service.js";
 import { AuthenticatedRequest } from "../auth/auth.middleware.js";
 
 export const createUrlHandler = async (
@@ -16,10 +16,13 @@ export const createUrlHandler = async (
       expiryDate ? new Date(expiryDate) : undefined
     );
 
+    const baseUrl = process.env.BASE_URL || "http://localhost:3000";
+
     res.status(201).json({
       success: true,
       data: {
         shortCode: url.shortCode,
+        shortUrl: `${baseUrl}/api/urls/${url.shortCode}`,
         longUrl: url.longUrl,
       },
     });
@@ -69,4 +72,3 @@ export const deleteUrlHandler = async (
     next(error);
   }
 };
-

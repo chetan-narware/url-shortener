@@ -1,39 +1,32 @@
-import {nanoid} from "nanoid";
-import { createUrl,findByShortCode,deleteUrl,incrementClickCount, createClick } from "./url.repository.js";
-import { error } from "node:console";
+import { nanoid } from "nanoid";
+import { redis } from "../../config/redis.js";
+import {
+  createUrl,
+  findByShortCode,
+  deleteUrl,
+  incrementClickCount,
+  createClick,
+} from "./url.repository.js";
 
 export const generateShortCode = () => {
-    return nanoid(7);
-}
-
-export const createShortUrl = async (
-    longUrl : string,
-    userId? : number,
-    expiryDate?: Date,
-) => {
-   let shortCode = generateShortCode();
-   let existing = await findByShortCode(shortCode);
-   while(existing){
-    shortCode = generateShortCode();
-    existing = await findByShortCode(shortCode);
-   }
-
-   return createUrl(shortCode, longUrl, userId, expiryDate);
+  return nanoid(7);
 };
 
-export const getLongUrl = async (shortCode: string) => {
-    const url = await findByShortCode(shortCode);
-    if(!url){
-        throw new Error("URL not found");
-    }
+export const createShortUrl = async (
+  longUrl: string,
+  userId?: number,
+  expiryDate?: Date
+) => {
+  let shortCode = generateShortCode();
 
-    if(url.expiryDate && new Date() > url.expiryDate){
-        throw new Error("URL had expired");
-    }
+  let existing = await findByShortCode(shortCode);
+  while (existing) {
+    shortCode = generateShortCode();
+    existing = await findByShortCode(shortCode);
+  }
 
-    await incrementClickCount(url.id);
-    return url.longUrl;
-}
+  return createUrl(shortCode, longUrl, userId, expiryDate);
+};
 
 export const removeUrl = async (
   shortCode: string,
@@ -45,12 +38,12 @@ export const removeUrl = async (
     throw new Error("URL not found");
   }
 
-  // If URL is tied to a user, ensure ownership
   if (url.userId && url.userId !== userId) {
     throw new Error("Unauthorized");
   }
 
-  return deleteUrl(shortCode);
+  await deleteUrl(shortCode);
+  await redis.del(shortCode);
 };
 
 export const handleRedirect = async (
@@ -58,21 +51,38 @@ export const handleRedirect = async (
   ipAddress?: string,
   userAgent?: string
 ) => {
-  const url = await findByShortCode(shortCode);
+  const cachedUrl = await redis.get(shortCode);
 
-  if (!url) {
+  let longUrl: string;
+  let urlRecord;
+
+  if (cachedUrl) {
+    longUrl = cachedUrl;
+    urlRecord = await findByShortCode(shortCode);
+  } else {
+    urlRecord = await findByShortCode(shortCode);
+
+    if (!urlRecord) {
+      throw new Error("URL not found");
+    }
+
+    if (urlRecord.expiryDate && new Date() > urlRecord.expiryDate) {
+      throw new Error("URL has expired");
+    }
+
+    longUrl = urlRecord.longUrl;
+
+    await redis.set(shortCode, longUrl, {
+      EX: 60 * 60,
+    });
+  }
+
+  if (!urlRecord) {
     throw new Error("URL not found");
   }
 
-  if (url.expiryDate && new Date() > url.expiryDate) {
-    throw new Error("URL has expired");
-  }
+  await incrementClickCount(urlRecord.id);
+  await createClick(urlRecord.id, ipAddress, userAgent);
 
-  // Increment counter
-  await incrementClickCount(url.id);
-
-  // Store click analytics
-  await createClick(url.id, ipAddress, userAgent);
-
-  return url.longUrl;
+  return longUrl;
 };

@@ -29,10 +29,11 @@ export const authenticate = async (
     const token = authHeader.split(" ")[1];
 
     const decoded = jwt.verify(token, JWT_SECRET) as {
-      userId: number;
+      id: number;
+      email: string;
     };
 
-    const user = await findById(decoded.userId);
+    const user = await findById(decoded.id);
 
     if (!user) {
       return res.status(401).json({

@@ -1,14 +1,11 @@
-import Redis from "ioredis";
-import { env } from "./env";
+import { createClient } from "redis";
 
-export const redis = new Redis(
-  env.REDIS_URL ?? "redis://localhost:6379"
-);
-
-redis.on("connect", () => {
-  console.log("Redis connected");
+export const redis = createClient({
+  url: process.env.REDIS_URL || "redis://localhost:6379",
 });
 
-redis.on("error", (err) => {
-  console.error("Redis error:", err);
+redis.on("error", (err: unknown) => {
+  console.error("Redis Error:", err);
 });
+
+await redis.connect();

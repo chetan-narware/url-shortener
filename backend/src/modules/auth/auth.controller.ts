@@ -8,7 +8,7 @@ export const registerHandler = async (
 ) => {
     try{
         const {email,password} = req.body; // get email password from HTTP request Body
-        const user = registerUser(email,password); // register user using email password
+        const user = await registerUser(email,password); // register user using email password
         res.status(201).json({
             success : true,
             message: "User Registered Successfully",
