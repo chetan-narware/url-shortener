@@ -22,8 +22,11 @@ const Register = () => {
       });
 
       navigate("/login");
-    } catch (error) {
-      alert("Registration failed");
+    } catch (error: any) {
+      const message =
+        error?.response?.data?.message ||
+        "Registration failed";
+      alert(message);
     } finally {
       setLoading(false);
     }

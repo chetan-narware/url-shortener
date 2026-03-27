@@ -26,7 +26,7 @@ const Login = () => {
       login(res.data.token);
       navigate("/");
     } catch (error) {
-      alert("Login failed");
+      alert("Login failed username or password is incorrect.");
     } finally {
       setLoading(false);
     }
